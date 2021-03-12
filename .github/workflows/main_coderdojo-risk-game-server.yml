@@ -25,8 +25,7 @@ jobs:
       working-directory: ./server
       run: |
         npm install
-        npm run build --if-present
-        npm run test --if-present
+        npm run build
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
@@ -34,4 +33,4 @@ jobs:
         app-name: 'coderdojo-risk-game-server'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_53319bd5e7d34c9982dd47f66e18cf01 }}
-        package: ./server
+        package: ./server/dist
