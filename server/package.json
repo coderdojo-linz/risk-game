@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc && copyfiles web.config dist && copyfiles assets/**/*.* dist && copyfiles package.json dist && cd dist && npm install --only=productio",
+    "build": "tsc && copyfiles web.config dist && copyfiles assets/**/*.* dist && copyfiles package.json dist && cd dist && npm install --only=production",
     "build-watch": "tsc --watch",
     "start": "nodemon dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
