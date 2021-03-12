@@ -22,6 +22,7 @@ jobs:
         node-version: '14.x'
 
     - name: npm install, build, and test
+      working-directory: ./server
       run: |
         npm install
         npm run build --if-present
@@ -33,4 +34,4 @@ jobs:
         app-name: 'coderdojo-risk-game-server'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_53319bd5e7d34c9982dd47f66e18cf01 }}
-        package: .
+        package: ./server
