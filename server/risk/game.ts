@@ -1,3 +1,4 @@
+
 import { Country } from "./country";
 import { Player } from "./player";
 import { Territory } from "./territory";
@@ -108,6 +109,26 @@ export class Game {
     }
 
     allocateTerritory(player: Player, country: Country) {
-        // TODO: allocate territory
+        if (
+            player &&
+            country &&
+            this.state === 'allocatingTerritories' &&
+            player === this.players[this.currentPlayer] &&
+            player.availableArmies > 0
+        ) {
+            const territory = player.territories.find(territory => territory.name === country);
+            if (territory) {
+                player.availableArmies--;
+                territory.armies++;
+                this.setNextPlayer();
+            }
+        }
+    }
+    private setNextPlayer(): void {
+        if (this.currentPlayer === this.players.length - 1) {
+            this.currentPlayer = 0;
+        } else {
+            this.currentPlayer++;
+        }
     }
 }

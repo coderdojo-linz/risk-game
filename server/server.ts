@@ -82,10 +82,10 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
-  // start gam
+  // start game
   socket.on('start game', () => {
     if(!player || !game) {
-      socket.emit("error", "Es wurd noch kein Spiel angelegt.");
+      socket.emit("error", "Es wurde noch kein Spiel angelegt.");
       return;
     }
     game.start();
@@ -98,6 +98,13 @@ io.on('connection', (socket: Socket) => {
   // allocate territory
   socket.on('allocate territory', (country: Country) => {
     // TODO: allocate territory
+    if(!player || !game) {
+      socket.emit("error", "Es wurde noch kein Spiel angelegt.");
+      return;
+    }
+    game.allocateTerritory(player, country);
+    socket.to(game.id.toString()).broadcast.emit("game updated", game);
+    socket.emit("game updated", game);
   });
 
   // leave game
