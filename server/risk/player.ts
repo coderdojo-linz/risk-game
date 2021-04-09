@@ -1,3 +1,10 @@
+import { Country } from "./country";
+
 export class Player {
-    constructor(public name: string, public color: string) {}
+    public territories: { name: Country, armies: number }[];
+    public availableArmies: number = 0;
+
+    constructor(public name: string, public color: string) {
+        this.territories = [];
+    }
 }
