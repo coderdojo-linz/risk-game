@@ -84,27 +84,16 @@ io.on('connection', (socket: Socket) => {
 
   // start game
   socket.on('start game', () => {
-    if(!player || !game) {
-      socket.emit("error", "Es wurde noch kein Spiel angelegt.");
+    if (!player || !game) {
+      socket.emit('error', 'Your have not created a game.');
       return;
     }
-    game.start();
-    socket.to(game.id.toString()).broadcast.emit("game updated", game);
-    socket.emit("game updated", game);
-    socket.broadcast.emit("games changed", gameController.games);
-    socket.emit("games changed", gameController.games);
-  });
 
-  // allocate territory
-  socket.on('allocate territory', (country: Country) => {
-    // TODO: allocate territory
-    if(!player || !game) {
-      socket.emit("error", "Es wurde noch kein Spiel angelegt.");
-      return;
-    }
-    game.allocateTerritory(player, country);
-    socket.to(game.id.toString()).broadcast.emit("game updated", game);
-    socket.emit("game updated", game);
+    game.start();
+    console.log('game started', game.name);
+    socket.emit('game updated', game);
+    socket.to(game.id.toString()).broadcast.emit('game updated', game);
+    socket.broadcast.emit('games changed', gameController.games);
   });
 
   // distribute armies
@@ -114,10 +103,23 @@ io.on('connection', (socket: Socket) => {
       return;
     }
 
-    game.distributeArmies(player);
+    game.distributeArmies();
     console.log('distribute armies', game.name);
     socket.emit('game updated', game);
     socket.to(game.id.toString()).broadcast.emit('game updated', game);
+  });
+
+  // allocate territory
+  socket.on('allocate territory', (country: Country) => {
+    if (player && game) {
+      try {
+        game.allocateTerritory(player, country);
+        socket.emit('game updated', game);
+        socket.to(game.id.toString()).broadcast.emit('game updated', game);
+      } catch (error: any) {
+        socket.emit('error', error.message);
+      }
+    }
   });
 
   // place reinforcements
@@ -132,6 +134,45 @@ io.on('connection', (socket: Socket) => {
         socket.emit('error', error.message);
       }
     }
+  });
+
+  // attack
+  socket.on('attack', (attackingCountry: Country, defendingCountry: Country, armies: 1 | 2 | 3) => {
+    if (!player || !game) {
+      socket.emit('error', 'Your have not created a game.');
+      return;
+    }
+
+    console.log('attack', game.name, attackingCountry, defendingCountry, armies);
+    game.attack(player, attackingCountry, defendingCountry, armies);
+    socket.emit('game updated', game);
+    socket.to(game.id.toString()).broadcast.emit('game updated', game);
+  });
+
+  // defend
+  socket.on('defend', (armies: 1 | 2) => {
+    if (!player || !game) {
+      socket.emit('error', 'Your have not created a game.');
+      return;
+    }
+
+    console.log('defend', armies);
+    game.defend(player, armies);
+    socket.emit('game updated', game);
+    socket.to(game.id.toString()).broadcast.emit('game updated', game);
+  });
+
+  // end attack
+  socket.on('end attack', (attackingCountry: Country, defendingCountry: Country, armies: 1 | 2 | 3) => {
+    if (!player || !game) {
+      socket.emit('error', 'Your have not created a game.');
+      return;
+    }
+
+    console.log('end attack');
+    game.endAttack(player);
+    socket.emit('game updated', game);
+    socket.to(game.id.toString()).broadcast.emit('game updated', game);
   });
 
   // leave game
