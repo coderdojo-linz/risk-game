@@ -36,14 +36,13 @@ export class GameController {
             throw(new Error(`Name ${playerName} is already taken, please chose another name.`))
         }
 
-        // TODO: find next available color  
-        let newColor: string = "";
-        GameController.colors.forEach(color => {
-            if(!newColor && !game.players.find(player => player.color === color)) {
-                newColor = color;
-                
+        // find next available color
+        let newColor = ''
+        for (let i = 0; i < GameController.colors.length && !newColor; i++) {
+            if (!game.players.find(p => p.color === GameController.colors[i])) {
+                newColor = GameController.colors[i];
             }
-        });
+        }
 
         const player = new Player(playerName, newColor);
         game.players.push(player);

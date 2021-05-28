@@ -107,6 +107,33 @@ io.on('connection', (socket: Socket) => {
     socket.emit("game updated", game);
   });
 
+  // distribute armies
+  socket.on('distribute armies', () => {
+    if (!player || !game) {
+      socket.emit('error', 'Your have not created a game.');
+      return;
+    }
+
+    game.distributeArmies(player);
+    console.log('distribute armies', game.name);
+    socket.emit('game updated', game);
+    socket.to(game.id.toString()).broadcast.emit('game updated', game);
+  });
+
+  // place reinforcements
+  socket.on('place reinforcement', (country: Country) => {
+    if (player && game) {
+      try {
+        console.log('place reinforcement', game.name);
+        game.placeReinforcement(player, country);
+        socket.emit('game updated', game);
+        socket.to(game.id.toString()).broadcast.emit('game updated', game);
+      } catch (error: any) {
+        socket.emit('error', error.message);
+      }
+    }
+  });
+
   // leave game
   socket.on('leave game', () => {
     if (!player || !game) {
