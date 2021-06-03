@@ -239,16 +239,20 @@ export class Game {
     }
 
     attack(player: Player, attackingCountry: Country, defendingCountry: Country, armies: 1 | 2 | 3) {
-        const attackingTerritory = player.territories.find(t => t.name == attackingCountry);
         this.attackWarning = '';
         this.attackResult = null;
 
         if (this.state == 'attack'
-            && player == this.players[this.currentPlayer]
-            && attackingTerritory
-            && !player.territories.find(t => t.name == defendingCountry)) {
+            && player == this.players[this.currentPlayer]) {
             this.attackWarning = '';
             this.attackedPlayer = -1;
+
+            const attackingTerritory = player.territories.find(t => t.name == attackingCountry);
+            const defendingTerritory = !player.territories.find(t => t.name == defendingCountry);
+            if (!attackingTerritory || !defendingTerritory) {
+                this.attackWarning = 'Das angreifende oder das verteidigendes Land wurde nicht korrekt gesetzt.';
+                return;
+            }
 
             // check if numberOfArmies is allowed
             if (armies >= attackingTerritory.armies) {
@@ -381,6 +385,10 @@ export class Game {
 
     private setNextPlayer() {
         this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+
+        if (this.players[this.currentPlayer].territories.length == 0) {
+            this.setNextPlayer();
+        }
     }
 
     private hasAllCountriesinContinent(player: Player, continent: Continent) {
