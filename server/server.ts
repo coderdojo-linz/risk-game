@@ -182,8 +182,8 @@ io.on('connection', (socket: Socket) => {
     }
 
     try {
-      socket.leave(game.id.toString());
       const result = gameController.leaveGame(player, game);
+      socket.leave(game.id.toString());
       player = null;
       game = null;
 

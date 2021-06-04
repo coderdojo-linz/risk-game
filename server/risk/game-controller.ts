@@ -29,11 +29,11 @@ export class GameController {
         }
 
         if (game.state !== 'waitingForPlayers') {
-            throw(new Error('You cannot join a game that is already running.'))
+            throw (new Error('You cannot join a game that is already running.'))
         }
 
         if (game.players.find(p => p.name === playerName)) {
-            throw(new Error(`Name ${playerName} is already taken, please chose another name.`))
+            throw (new Error(`Name ${playerName} is already taken, please chose another name.`))
         }
 
         // find next available color
@@ -58,7 +58,7 @@ export class GameController {
         if (player && game) {
             const index = game.players.indexOf(player);
 
-            if (index === 0) {
+            if (index === 0 && game.state === 'waitingForPlayers') {
                 leftGame = game;
                 status = 'stopped';
 
@@ -68,16 +68,38 @@ export class GameController {
                 }
 
                 console.log('player', player.name, 'stopped game', game.name);
-            } else if (index > 0) {
-
+            } else {
                 game.players.splice(index, 1);
                 leftGame = game;
                 status = 'left';
 
-                console.log('player', player.name, 'left game', game.name);
+                console.log('player', player.name, 'left game', game.name, game.players.length, 'players left');
+
+                if (game.players.length === 0) {
+                    // remove game if no players are left
+                    status = 'stopped';
+
+                    const gameIndex = this.games.indexOf(game);
+                    if (gameIndex >= 0) {
+                        this.games.splice(gameIndex, 1);
+                    }
+
+                    console.log('game', game.name, 'has been removed');
+                } else {
+                    // distribute territories
+                    let i = 0;
+                    for (let territory of player.territories) {
+                        game.players[i % game.players.length].territories.push(territory);
+                        i++;
+                    }
+
+                    if (game.currentPlayer >= game.players.length) {
+                        game.currentPlayer++;
+                    }
+                }
             }
         }
 
-        return { game: leftGame, status: status};
+        return { game: leftGame, status: status };
     }
 }
